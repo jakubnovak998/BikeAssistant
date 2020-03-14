@@ -1,0 +1,7 @@
+{
+  "name": "bike-assistant-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
