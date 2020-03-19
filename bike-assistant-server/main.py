@@ -61,9 +61,5 @@ def register():
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     app.run(ssl_context=('cert/cert.pem', 'cert/key.pem'))
-=======
-    app.run(ssl_context=('cert.pem', 'key.pem'))
->>>>>>> added HTTPS support
 
