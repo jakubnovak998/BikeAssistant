@@ -1,6 +1,4 @@
 cert/cert.pem
 cert/key.pem
-<<<<<<< HEAD
 /venv/
-=======
->>>>>>> added HTTPS support
+venv/
