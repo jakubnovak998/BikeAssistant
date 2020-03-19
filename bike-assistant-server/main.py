@@ -9,6 +9,7 @@ conn = sqlite3.connect('first.db', check_same_thread=False)
 # id autoincrement, username unique, password, email, join_date
 c = conn.cursor()
 
+
 def new_user(username, password, mail):
     try:
         c.execute("INSERT INTO USERS(username,password,mail,join_date) \
@@ -17,6 +18,7 @@ def new_user(username, password, mail):
         return False
     c.execute("commit")
     return True
+
 
 @app.route('/api/list')
 def list_users():
