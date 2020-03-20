@@ -3,11 +3,13 @@ from flask import Flask, request
 import sqlite3
 import json
 import datetime
+import uuid
 
 app = Flask(__name__)
 conn = sqlite3.connect('first.db', check_same_thread=False)
 # id autoincrement, username unique, password, email, join_date
 c = conn.cursor()
+
 
 def new_user(username, password, mail):
     try:
@@ -17,6 +19,19 @@ def new_user(username, password, mail):
         return False
     c.execute("commit")
     return True
+
+
+def login_user(username,password):
+    user_list = []
+    for row in c.execute("select username from USERS"):
+        user_list.append(row[0])
+    if username in user_list:
+        c.execute('select password from USERS where username= ?;', (username,))
+        passwords_db = c.fetchone()[0]
+        print(passwords_db)
+        if password == passwords_db:
+            return True
+        return False
 
 @app.route('/api/list')
 def list_users():
@@ -52,6 +67,21 @@ def register():
         mail = content['mail']
         print(username, password, mail)
         if new_user(username, password, mail) is True:
+            return json.dumps({'RESPONSE': 'SUCCESS'})
+        else:
+            return json.dumps({'RESPONSE': 'FAILED'})
+    return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
+
+
+@app.route('/api/login', methods=['GET', 'POST'])
+def login():
+    if request.is_json:
+        content = request.get_json()
+        print(content)
+        username = content['username']
+        password = content['password']
+        print(username, password)
+        if login_user(username, password) is True:
             return json.dumps({'RESPONSE': 'SUCCESS'})
         else:
             return json.dumps({'RESPONSE': 'FAILED'})
