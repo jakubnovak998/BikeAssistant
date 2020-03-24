@@ -3,7 +3,7 @@ from flask import Flask, request
 import sqlite3
 import json
 import datetime
-import uuid
+import secrets
 
 app = Flask(__name__)
 conn = sqlite3.connect('first.db', check_same_thread=False)
@@ -33,13 +33,41 @@ def login_user(username,password):
             return True
         return False
 
-@app.route('/api/list')
+
+def gen_api_key(username):
+    c.execute("select user_id from users where username= ?", (username,))
+    user_id = c.fetchone()[0]
+    print(user_id)
+    c.execute("DELETE FROM API_KEYS WHERE user_id= ?", (user_id,))
+    api = secrets.token_hex(16)
+    c.execute("INSERT INTO API_KEYS(user_id,api_key) VALUES(?, ?)", (user_id, api))
+    c.execute('commit')
+    return api
+
+
+def check_api_key(user_key):
+    user_id = []
+    for row in c.execute("select api_key from api_keys"):
+        user_id.append(row[0])
+    print(user_id)
+    if user_key in user_id:
+        return True
+    else:
+        return False
+
+
+@app.route('/api/list', methods=['POST'])
 def list_users():
-    user_list=[]
-    for row in c.execute("select username from USERS"):
-        #print(row[0])
-        user_list.append(row[0])
-    return json.dumps({'users':user_list})
+    if request.is_json:
+        user_list = []
+        content = request.get_json()
+        if check_api_key(content['API_KEY']) is True:
+            for row in c.execute("select username from USERS"):
+                #print(row[0])
+                user_list.append(row[0])
+            return json.dumps({'users':user_list})
+        return json.dumps({'STATUS': 'ERROR. API KEY NOT VALID'})
+    return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
 """
 @app.route('/api/register', methods=['GET', 'POST'])
@@ -82,7 +110,7 @@ def login():
         password = content['password']
         print(username, password)
         if login_user(username, password) is True:
-            return json.dumps({'RESPONSE': 'SUCCESS'})
+            return json.dumps({'RESPONSE': 'SUCCESS', 'API_KEY': gen_api_key(username)})
         else:
             return json.dumps({'RESPONSE': 'FAILED'})
     return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
