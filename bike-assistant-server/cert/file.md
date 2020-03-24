@@ -1,1 +1,1 @@
-In this folder program sore certificates
+In this folder program store certificates
