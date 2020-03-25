@@ -56,3 +56,8 @@ def register():
         else:
             return json.dumps({'RESPONSE': 'FAILED'})
     return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
+
+
+if __name__ == "__main__":
+    app.run(ssl_context=('cert/cert.pem', 'cert/key.pem'))
+
