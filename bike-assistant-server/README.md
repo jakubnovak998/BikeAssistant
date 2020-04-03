@@ -1,17 +1,17 @@
-##To install required libs
+# To install required libs
 ```
 pip install -r requirements.txt
 ```
-##Register example
+# Register example
 ```
 curl --insecure -d '{"username":"Reg_Test", "password":"pleaseDontHack","mail":"Test@test.tart"}' -H "Content-Type: application/json" -X POST https://localhost:5000/api/register
 ```
-##Login example (returns api key)
+# Login example (returns api key)
 ```
 curl --insecure -d '{"username":"Reg_Test", "password":"pleaseDontHack"}' -H "Content-Type: application/json" -X POST https://localhost:5000/api/login
 ```
 
-##List users (require valid api key)
+# List users (require valid api key)
 ```
 curl --insecure -d '{"API_KEY":"bde7167a7aedc024deabc5ef57d32e3b"}' -H "Content-Type: application/json" -X POST https://localhost:5000/api/list
 ```
