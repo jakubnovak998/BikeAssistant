@@ -37,7 +37,6 @@ export class Tab1Page  {
   }
 
   private initMap(): void {
-
       this.geoLocation.getCurrentPosition({ enableHighAccuracy : true }).then((pos) => {
           const latLng: LatLng = new LatLng(pos.coords.latitude, pos.coords.longitude);
           const mapOptions: GoogleMapOptions = {
@@ -58,17 +57,17 @@ export class Tab1Page  {
           console.log(error);
       });
 
-
       const watch = this.geoLocation.watchPosition({ enableHighAccuracy : true, timeout: 10000 });
       watch.subscribe((pos) => {
           let position = new LatLng(pos.coords.latitude, pos.coords.longitude);
           let Camposition: any = {
-              target: position,
+              target: position
           };
           this.map.moveCamera(Camposition);
           this.marker.setPosition(position);
       });
   }
+
   startTracking() {
       this.isTracking = true;
       this.trackedRoute = [];
@@ -86,6 +85,7 @@ export class Tab1Page  {
               });
           });
   }
+
   redraw(path) {
       if (this.currentMapTrack) {
           this.currentMapTrack.setMap(null);
@@ -96,10 +96,10 @@ export class Tab1Page  {
               geodesic: true,
               color: '#ff00ff',
               strokeWeight: 3
-          }).then((polyline: any) => {
           });
       }
   }
+
   stopTracking() {
       this.isTracking = false;
       const newRoute = {finished: new Date().getTime(), path: this.trackedRoute};
