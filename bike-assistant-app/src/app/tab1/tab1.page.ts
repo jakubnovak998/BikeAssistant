@@ -57,13 +57,14 @@ export class Tab1Page  {
           console.log(error);
       });
 
-      const watch = this.geoLocation.watchPosition({ enableHighAccuracy : true, timeout: 10000 });
+      const watch = this.geoLocation.watchPosition(
+          { enableHighAccuracy : true, timeout: 10000 });
       watch.subscribe((pos) => {
-          let position = new LatLng(pos.coords.latitude, pos.coords.longitude);
-          let Camposition: any = {
+          const position = new LatLng(pos.coords.latitude, pos.coords.longitude);
+          const Cameraposition: any = {
               target: position
           };
-          this.map.moveCamera(Camposition);
+          this.map.moveCamera(Cameraposition);
           this.marker.setPosition(position);
       });
   }
@@ -76,7 +77,8 @@ export class Tab1Page  {
               filter(p => p.coords !== undefined)
           ).subscribe(data => {
               setTimeout(() => {
-                  this.trackedRoute.push({lat: data.coords.latitude, lng: data.coords.longitude});
+                  this.trackedRoute.push(
+                      {lat: data.coords.latitude, lng: data.coords.longitude});
                   this.redraw(this.trackedRoute);
                   this.marker.setPosition({
                       lat: data.coords.latitude,
