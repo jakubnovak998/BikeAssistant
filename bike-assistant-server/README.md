@@ -15,3 +15,4 @@ curl --insecure -d '{"username":"Reg_Test", "password":"pleaseDontHack"}' -H "Co
 ```
 curl --insecure -d '{"API_KEY":"bde7167a7aedc024deabc5ef57d32e3b"}' -H "Content-Type: application/json" -X POST https://localhost:5000/api/list
 ```
+
