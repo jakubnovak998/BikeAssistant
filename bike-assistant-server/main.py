@@ -109,7 +109,9 @@ def register():
             return json.dumps({'RESPONSE': 'SUCCESS'})
         else:
             return json.dumps({'RESPONSE': 'FAILED'})
-    return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
+    else:
+        print("THIS IS NOT JSON")
+        return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
 
 @app.route('/api/login', methods=['GET', 'POST'])
@@ -124,7 +126,9 @@ def login():
             return json.dumps({'RESPONSE': 'SUCCESS', 'API_KEY': gen_api_key(username)})
         else:
             return json.dumps({'RESPONSE': 'FAILED'})
-    return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
+    else:
+        print("THIS IS NOT JSON")
+        return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
 
 @app.route('/api/saveTrace', methods=['GET', 'POST'])
@@ -159,4 +163,4 @@ def save_tracking_data():
 
 
 if __name__ == "__main__":
-    app.run(ssl_context=('cert/cert.pem', 'cert/key.pem'))
+    app.run(host='0.0.0.0', ssl_context=('cert/cert.pem', 'cert/key.pem'))
