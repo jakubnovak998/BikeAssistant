@@ -17,9 +17,9 @@ export class RegistrationPage implements OnInit {
   }
   async onSubmit() {
       const postData = {
-          'username': this.name,
-          'email': this.email,
-          'password': this.password
+          username: this.name,
+          password: this.password,
+          mail: this.email
       };
 
    // this.http.get('https://my-json-server.typicode.com/typicode/demo/profile', {}, {'Content-Type': 'application/json'})
@@ -38,6 +38,7 @@ export class RegistrationPage implements OnInit {
    //
    //        });
       this.http.setServerTrustMode('nocheck');
+      this.http.setDataSerializer('json');
       this.http.post('https://192.168.1.232:5000/api/register', postData, {'Content-Type': 'application/json'})
        .then(data => {
 
