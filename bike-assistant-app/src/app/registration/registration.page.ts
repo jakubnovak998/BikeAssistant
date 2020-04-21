@@ -37,7 +37,8 @@ export class RegistrationPage implements OnInit {
    //            console.log(error.headers);
    //
    //        });
-      this.http.post('http://localhost:5000/api/register', postData, {'Content-Type': 'application/json'})
+      this.http.setServerTrustMode('nocheck');
+      this.http.post('https://192.168.1.232:5000/api/register', postData, {'Content-Type': 'application/json'})
        .then(data => {
 
               console.log(data);
