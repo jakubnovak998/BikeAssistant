@@ -28,10 +28,12 @@ export class Tab1Page  {
   positionSubscritpion: Subscription;
   marker: Marker;
 
+
   constructor(private platform: Platform, private navController: NavController,
               private geoLocation: Geolocation, private toastCtrl: ToastController) {
   }
-
+    imgStart = 'assets/start.png';
+    imgStop = 'assets/stop.png';
   public ngAfterViewInit() {
     this.platform.ready().then(() => this.initMap());
   }
