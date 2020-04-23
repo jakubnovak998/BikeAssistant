@@ -134,23 +134,23 @@ def login():
 @app.route('/api/saveTrace', methods=['GET', 'POST'])
 def save_tracking_data():
     if request.is_json:
-
         content = request.get_json()
-
         print(content)
         user_key = content['API_KEY']
         trace = content['TRACE']
-        #print(user_key, trace[0][0]['tak'])
+        date = content['DATE']
+        duration = content['DURATION']
+        distance = content['DISTANCE']
         user_id = get_user_id(user_key)
         if user_id == -1:
             return json.dumps({'RESPONSE': 'USER KEY NOT VALID'})
-        c.execute("INSERT INTO trace_users(user_id,date,time) \
-            VALUES(?, ? ,?)", (user_id, str(datetime.date.today()), datetime.datetime.now().strftime("%H:%M:%S")))
+        c.execute("INSERT INTO trace_users(user_id,date,duration,distance) \
+            VALUES(?, ? ,?,?)", (user_id, date, duration, distance))
         c.execute("commit")
         c.execute("select last_insert_rowid();")
         trace_id = c.fetchone()[0]
         print(trace_id)
-        for i in range(0, len(trace),2):
+        for i in range(0, len(trace), 2):
             c.execute("INSERT INTO trace(trace_id,idx,lat,lng) \
                         VALUES(?, ? ,?,?)",
                       (trace_id, int((i / 2)) + 1, trace[i][0]['lat'], trace[i+ 1][0]['lng']))
