@@ -40,7 +40,7 @@ export class AppComponent {
 
       this.authenticationService.authenticationState.subscribe(state => {
         if (state) {
-          this.router.navigate(['tabs', '']);
+          this.router.navigate(['tabs']);
         } else {
           this.router.navigate(['home']);
         }
