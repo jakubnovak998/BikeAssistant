@@ -10,5 +10,9 @@
         <div style="height: 80%;width: 100%" id="map_canvas"></div>
     <button ion-button full *ngIf="!isTracking" (click)="startTracking()">Start</button>
     <button ion-button full *ngIf="isTracking" (click)="stopTracking()">Stop</button>
-
+    <ion-item>
+        <ion-label>
+            Duration {{duration}}
+        </ion-label>
+    </ion-item>
 </ion-content>
