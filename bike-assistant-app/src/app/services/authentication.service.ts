@@ -31,7 +31,7 @@ export class AuthenticationService {
   register(postData) {
       const self = this;
       return new Promise((resolve, reject) => {
-          self.http.post('https://10.0.0.74:5000/api/register', postData, {'Content-Type': 'application/json'})
+          self.http.post('https://10.0.2.2:5000/api/register', postData, {'Content-Type': 'application/json'})
           .then(data => {
                 resolve(data);
               }
@@ -45,7 +45,7 @@ export class AuthenticationService {
   login(loginData) {
       const self = this;
       return new Promise((resolve, reject) => {
-          self.http.post('https://10.0.0.74:5000/api/login', loginData, {'Content-Type': 'application/json'})
+          self.http.post('https://10.0.2.2:5000/api/login', loginData, {'Content-Type': 'application/json'})
               .then((data: any) => {
                   if (data.API_KEY) {
                       this.storage.set(TOKEN_KEY, data.API_KEY).then(() => {
