@@ -10,13 +10,13 @@
   <ion-grid>
     <ion-row>
       <ion-col align-self-center>
-        <ion-button [routerLink]="['/registration']" expand="block" color="primary">Register</ion-button>
+        <ion-button name="registerBtn" [routerLink]="['/registration']" routerLinkActive="active" expand="block" color="primary">Register</ion-button>
 
         <span class="divider line one-line">or</span>
 
         <span class="already">Already a user?</span>
 
-        <ion-button [routerLink]="['/login']" expand="block" color="danger">Sign In</ion-button>
+        <ion-button name="loginBtn" [routerLink]="['/login']" routerLinkActive="active" expand="block" color="danger">Sign In</ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
