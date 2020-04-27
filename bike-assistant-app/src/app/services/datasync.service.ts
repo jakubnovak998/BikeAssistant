@@ -9,8 +9,8 @@ const TOKEN_KEY = 'auth-token';
 @Injectable({
   providedIn: 'root'
 })
-export class DatasyncService {
-
+export class TraceService {
+  ipKey = '10.0.2.2';
   constructor(private storage: Storage, private plt: Platform, private http: HTTP, private authService: AuthenticationService) {
     this.plt.ready().then(() => {
       this.authService.checkToken();
@@ -28,7 +28,7 @@ export class DatasyncService {
       DISTANCE: distance
     };
     return new Promise((resolve, reject) => {
-      self.http.post('https://10.0.2.2:5000/api/saveTrace', postData, {'Content-Type': 'application/json'})
+      self.http.post('https://' + this.ipKey + ':5000/api/saveTrace', postData, {'Content-Type': 'application/json'})
           .then(data => {
                 resolve(data);
               }
