@@ -13,11 +13,13 @@ import { HTTP } from '@ionic-native/http/ngx';
 import { IonicStorageModule } from '@ionic/storage';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import {TabsPageModule} from './tabs/tabs.module';
+import {TabsPage} from './tabs/tabs.page';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, IonicStorageModule.forRoot()],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, IonicStorageModule.forRoot(), TabsPageModule],
   providers: [
     StatusBar,
     SplashScreen,
