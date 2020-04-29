@@ -14,6 +14,7 @@ import {
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import {TraceService} from '../services/datasync.service';
 
 @Component({
   selector: 'app-tab1',
@@ -34,7 +35,8 @@ export class Tab1Page  {
   distance = '0.0';
   speed = '0.0';
   constructor(private platform: Platform, private navController: NavController,
-              private geoLocation: Geolocation, private toastCtrl: ToastController) {
+              private geoLocation: Geolocation, private toastCtrl: ToastController,
+              private traceService: TraceService) {
       setInterval(() => {this.refTime(); }, 1000 );
   }
 
@@ -131,10 +133,12 @@ export class Tab1Page  {
   }
 
   stopTracking() {
+      this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
       this.isTracking = false;
       const newRoute = {finished: new Date().getTime(), path: this.trackedRoute};
       this.isTracking = false;
       this.positionSubscritpion.unsubscribe();
       this.currentMapTrack.setMap(null);
+
   }
 }
