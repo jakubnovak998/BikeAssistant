@@ -149,10 +149,10 @@ def save_tracking_data():
         c.execute("select last_insert_rowid();")
         trace_id = c.fetchone()[0]
         print(trace_id)
-        for i in range(0, len(trace), 2):
+        for i in range(0, len(trace)):
             c.execute("INSERT INTO trace(trace_id,idx,lat,lng) \
                         VALUES(?, ? ,?,?)",
-                      (trace_id, int((i / 2)) + 1, trace[i][0]['lat'], trace[i+ 1][0]['lng']))
+                      (trace_id, i + 1, trace[i]['lat'], trace[i]['lng']))
             print(i)
         c.execute("commit")
         return json.dumps({'RESPONSE': 'SUCCESS'})
