@@ -20,7 +20,11 @@ const routes: Routes = [
     path: 'tabs',
     canActivate: [AuthGuard],
     loadChildren: () => import('./tabs/tabs.module').then( m => m.TabsPageModule)
+  },  {
+    path: 'tab4',
+    loadChildren: () => import('./tab4/tab4.module').then( m => m.Tab4PageModule)
   },
+
 ];
 @NgModule({
   imports: [
