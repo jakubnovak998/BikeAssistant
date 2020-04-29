@@ -27,15 +27,35 @@ export class Tab1Page  {
   trackedRoute = [];
   positionSubscritpion: Subscription;
   marker: Marker;
-
+  timeStart;
+  timeEnd;
+  current;
+  duration = '00:00:00';
   constructor(private platform: Platform, private navController: NavController,
               private geoLocation: Geolocation, private toastCtrl: ToastController) {
+      setInterval(() => {this.refTime(); }, 1000 );
   }
 
   public ngAfterViewInit() {
     this.platform.ready().then(() => this.initMap());
   }
-
+  checkTime(i) {
+        if (i < 10) {
+            i = '0' + i.toString();
+        }
+        return i;
+    }
+  refTime() {
+      if (this.isTracking === true) {
+          this.timeEnd = new Date();
+          this.current = new Date(this.timeEnd - this.timeStart);
+          let temp = '';
+          temp += this.checkTime(this.current.getUTCHours()) + ':';
+          temp += this.checkTime(this.current.getUTCMinutes()) + ':';
+          temp += this.checkTime(this.current.getUTCSeconds());
+          this.duration = temp;
+      }
+  }
   private initMap(): void {
       this.geoLocation.getCurrentPosition({ enableHighAccuracy : true }).then((pos) => {
           const latLng: LatLng = new LatLng(pos.coords.latitude, pos.coords.longitude);
@@ -70,6 +90,8 @@ export class Tab1Page  {
   }
 
   startTracking() {
+      this.timeStart = new Date();
+      this.duration = '00:00:00';
       this.isTracking = true;
       this.trackedRoute = [];
       this.positionSubscritpion = this.geoLocation.watchPosition()

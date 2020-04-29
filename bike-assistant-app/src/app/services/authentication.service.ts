@@ -30,6 +30,7 @@ export class AuthenticationService {
         });
     }
 
+
     register(postData) {
         return new Promise((resolve, reject) => {
             this.http.post('https://' + this.ipKey + ':5000/api/register', postData, {'Content-Type': 'application/json'})
@@ -60,6 +61,7 @@ export class AuthenticationService {
                 console.log(error);
             });
     }
+
 
     logout() {
         return this.storage.remove(TOKEN_KEY).then(() => {
