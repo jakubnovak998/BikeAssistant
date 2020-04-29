@@ -22,20 +22,17 @@ export class TraceService {
   saveTrace(trace, date, distance, duration) {
     this.api = '';
     this.storage.get(TOKEN_KEY).then((res) => {
-      if (res) {
-        this.api = res.toString();
-      } else {
-        this.api = 'test';
-      }
-    });
-    const postData = {
+     console.log('log:', res);
+     this.api = res;
+     console.log('log2:', this.api);
+     const postData = {
       API_KEY: this.api,
       TRACE: trace,
       DATE: date,
       DURATION: duration,
       DISTANCE: distance
-    };
-    return new Promise((resolve, reject) => {
+     };
+     return new Promise((resolve, reject) => {
       this.http.post('https://' + this.ipKey + ':5000/api/saveTrace', postData, {'Content-Type': 'application/json'})
           .then(data => {
                 resolve(data);
@@ -44,7 +41,7 @@ export class TraceService {
           .catch(error => {
             reject(error);
           });
-    });
+    }); });
   }
 
 }
