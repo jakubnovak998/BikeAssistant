@@ -5,15 +5,16 @@ import {
   NavController
 } from '@ionic/angular';
 import {
-  GoogleMaps,
-  GoogleMap,
-  Marker,
-  GoogleMapOptions,
-  LatLng
+    GoogleMaps,
+    GoogleMap,
+    Marker,
+    GoogleMapOptions,
+    LatLng, Spherical
 } from '@ionic-native/google-maps/ngx';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import {TraceService} from '../services/datasync.service';
 
 @Component({
   selector: 'app-tab1',
@@ -31,8 +32,11 @@ export class Tab1Page  {
   timeEnd;
   current;
   duration = '00:00:00';
+  distance = '0.0';
+  speed = '0.0';
   constructor(private platform: Platform, private navController: NavController,
-              private geoLocation: Geolocation, private toastCtrl: ToastController) {
+              private geoLocation: Geolocation, private toastCtrl: ToastController,
+              private traceService: TraceService) {
       setInterval(() => {this.refTime(); }, 1000 );
   }
 
@@ -92,6 +96,8 @@ export class Tab1Page  {
   startTracking() {
       this.timeStart = new Date();
       this.duration = '00:00:00';
+      this.distance = '0.0';
+      this.speed = '0.0';
       this.isTracking = true;
       this.trackedRoute = [];
       this.positionSubscritpion = this.geoLocation.watchPosition()
@@ -106,6 +112,8 @@ export class Tab1Page  {
                       lat: data.coords.latitude,
                       lng: data.coords.longitude
                   });
+                  this.distance = (Spherical.computeLength(this.trackedRoute) / 1000).toFixed(3);
+                  this.speed = (Number.isNaN(data.coords.speed) ? 0 : (data.coords.speed * 3.6)).toFixed(3);
               });
           });
   }
@@ -125,10 +133,12 @@ export class Tab1Page  {
   }
 
   stopTracking() {
+      this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
       this.isTracking = false;
       const newRoute = {finished: new Date().getTime(), path: this.trackedRoute};
       this.isTracking = false;
       this.positionSubscritpion.unsubscribe();
       this.currentMapTrack.setMap(null);
+
   }
 }
