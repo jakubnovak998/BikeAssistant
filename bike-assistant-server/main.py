@@ -161,5 +161,33 @@ def save_tracking_data():
         return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
 
+@app.route('/api/getHistory', methods=['GET', 'POST'])
+def get_tracking_data():
+    if request.is_json:
+        content = request.get_json()
+        print(content)
+        user_key = content['API_KEY']
+        user_id = get_user_id(user_key)
+        if user_id == -1:
+            return json.dumps({'RESPONSE': 'USER KEY NOT VALID'})
+        history = []
+        temp = []
+        d = conn.cursor()
+        for row in c.execute("select * from trace_users where user_id = " + str(user_id)):
+            temp.append(row)
+            history.append({'DATE': temp[-1][2], 'DURATION': temp[-1][3], 'DISTANCE': temp[-1][4], 'TRACE': temp[-1][0]})
+            trace_id = history[-1]['TRACE']
+            temp = []
+            trace = []
+            for row2 in d.execute("select lat,lng from trace where trace_id = " + str(trace_id) + " order by idx"):
+                temp.append(row2)
+                trace.append({'lat': temp[-1][0], 'lng': temp[-1][1]})
+            history[-1]['TRACE'] = trace
+        print(history)
+        return json.dumps({'RESPONSE': 'SUCCESS', 'DATA': history})
+    else:
+        return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
+
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', ssl_context=('cert/cert.pem', 'cert/key.pem'))
