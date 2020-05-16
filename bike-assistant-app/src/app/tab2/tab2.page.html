@@ -1,6 +1,10 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
+      <ion-button *ngIf="showMap" fill="clear" strong="true" color="dark" (click)="hideShow()">
+        <ion-icon name="arrow-back-sharp"></ion-icon>
+        Go Back
+      </ion-button>
+    <ion-title *ngIf="!showMap">
       History
     </ion-title>
   </ion-toolbar>
@@ -10,7 +14,21 @@
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-item *ngFor="let i of history">
-    {{i['DATE']}} {{i['DURATION']}} {{i['DISTANCE']}} {{getAvgSpeed(i['DURATION'],i['DISTANCE'])}}
-  </ion-item>
+  <ion-list *ngIf="!showMap">
+    <ion-item *ngFor="let i of history" button (click)="showHistoricalTrace(i)">
+      {{i['DATE']}} {{i['DURATION']}} {{i['DISTANCE']}} {{getAvgSpeed(i['DURATION'],i['DISTANCE'])}}
+    </ion-item>
+  </ion-list>
+  <ion-content *ngIf="showMap">
+    <ion-buttons (click)="hideShow()">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <div style="height: 60%;width: 100%" id="map_canvas"></div>
+    <ion-list>
+      <ion-item>Date: {{temp['DATE']}}</ion-item>
+      <ion-item>Duration: {{temp['DURATION']}}</ion-item>
+      <ion-item>Distance: {{temp['DISTANCE']}}</ion-item>
+      <ion-item>Speed: {{getAvgSpeed(temp['DURATION'],temp['DISTANCE'])}}</ion-item>
+    </ion-list>
+  </ion-content>
 </ion-content>
