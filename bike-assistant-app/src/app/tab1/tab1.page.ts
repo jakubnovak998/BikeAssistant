@@ -15,7 +15,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import {TraceService} from '../services/datasync.service';
-
+import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
@@ -34,9 +34,12 @@ export class Tab1Page  {
   duration = '00:00:00';
   distance = '0.0';
   speed = '0.0';
+  ttsDistance;
+  ttsPrevDistance;
+  ttsTimeTemp;
   constructor(private platform: Platform, private navController: NavController,
               private geoLocation: Geolocation, private toastCtrl: ToastController,
-              private traceService: TraceService) {
+              private traceService: TraceService, private tts: TextToSpeech) {
       setInterval(() => {this.refTime(); }, 1000 );
   }
 
@@ -106,7 +109,10 @@ export class Tab1Page  {
 
           }
       });
+      this.ttsDistance = 0;
+      this.ttsPrevDistance = 0.0;
       this.timeStart = new Date();
+      this.ttsTimeTemp = new Date();
       this.duration = '00:00:00';
       this.distance = '0.0';
       this.speed = '0.0';
@@ -125,6 +131,12 @@ export class Tab1Page  {
                       lng: data.coords.longitude
                   });
                   this.distance = (Spherical.computeLength(this.trackedRoute) / 1000).toFixed(3);
+                  if (parseInt(this.distance, 10) > this.ttsDistance) {
+                      this.ttsStats();
+                      this.ttsPrevDistance = parseFloat(this.distance);
+                      this.ttsDistance = parseInt(this.distance, 10);
+                      this.ttsTimeTemp = new Date();
+                  }
                   this.speed = (Number.isNaN(data.coords.speed) ? 0 : (data.coords.speed * 3.6)).toFixed(3);
               });
           });
@@ -146,11 +158,39 @@ export class Tab1Page  {
 
   stopTracking() {
       this.isTracking = false;
+      this.ttsStats();
       this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
       const newRoute = {finished: new Date().getTime(), path: this.trackedRoute};
       this.isTracking = false;
       this.positionSubscritpion.unsubscribe();
       this.currentMapTrack.setMap(null);
 
+  }
+  ttsStats() {
+      const timer = new Date(this.timeEnd - this.ttsTimeTemp);
+      const timeSeconds = timer.getUTCHours() * 3600 + timer.getUTCMinutes() * 60 + timer.getUTCSeconds();
+      const newDistance = parseFloat(this.distance) - parseFloat(this.ttsPrevDistance);
+      let readyTime = '';
+      let temp = timer.getUTCHours();
+      if (temp === 1 ) {
+          readyTime += temp.toString() + 'hour ';
+      } else if (temp > 1) {
+          readyTime += temp.toString() + 'hours ';
+      }
+      temp = timer.getUTCMinutes();
+      if (temp === 1 ) {
+          readyTime += temp.toString() + 'minute ';
+      } else if (temp > 1) {
+          readyTime += temp.toString() + 'minutes ';
+      }
+      temp = timer.getUTCSeconds();
+      if (temp === 1 ) {
+          readyTime += temp.toString() + 'second ';
+      } else if (temp > 1) {
+          readyTime += temp.toString() + 'seconds ';
+      }
+      this.tts.speak('Time: ' + readyTime + ' average speed ' + (newDistance / (timeSeconds / 3600)).toFixed(2) + 'kilometers per hour')
+          .then(() => console.log('Success'))
+          .catch((reason: any) => console.log(reason));
   }
 }
