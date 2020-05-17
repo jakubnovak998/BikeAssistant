@@ -94,6 +94,18 @@ export class Tab1Page  {
   }
 
   startTracking() {
+      this.map.clear();
+      this.traceService.getTrace().then((response: any) => {
+          for (const i of response) {
+              this.map.addPolyline({
+                  points: i.TRACE,
+                  geodesic: true,
+                  color: '#DCDCDC',
+                  strokeWeight: 2
+              });
+
+          }
+      });
       this.timeStart = new Date();
       this.duration = '00:00:00';
       this.distance = '0.0';
@@ -133,8 +145,8 @@ export class Tab1Page  {
   }
 
   stopTracking() {
-      this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
       this.isTracking = false;
+      this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
       const newRoute = {finished: new Date().getTime(), path: this.trackedRoute};
       this.isTracking = false;
       this.positionSubscritpion.unsubscribe();
