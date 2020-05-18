@@ -16,6 +16,7 @@ import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import {TraceService} from '../services/datasync.service';
 import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
+import {Storage} from '@ionic/storage';
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
@@ -37,9 +38,12 @@ export class Tab1Page  {
   ttsDistance;
   ttsPrevDistance;
   ttsTimeTemp;
+  ttsActive = true;
+  headphones;
   constructor(private platform: Platform, private navController: NavController,
               private geoLocation: Geolocation, private toastCtrl: ToastController,
-              private traceService: TraceService, private tts: TextToSpeech) {
+              private traceService: TraceService, private tts: TextToSpeech,
+              private storage: Storage) {
       setInterval(() => {this.refTime(); }, 1000 );
   }
 
@@ -109,6 +113,13 @@ export class Tab1Page  {
 
           }
       });
+      this.storage.get('TTS').then((res) => {
+          if (res === 1) {
+              this.ttsActive = true;
+          } else {
+              this.ttsActive = false;
+          }
+      });
       this.ttsDistance = 0;
       this.ttsPrevDistance = 0.0;
       this.timeStart = new Date();
@@ -131,7 +142,7 @@ export class Tab1Page  {
                       lng: data.coords.longitude
                   });
                   this.distance = (Spherical.computeLength(this.trackedRoute) / 1000).toFixed(3);
-                  if (parseInt(this.distance, 10) > this.ttsDistance) {
+                  if (this.ttsActive === true && parseInt(this.distance, 10) > this.ttsDistance) {
                       this.ttsStats();
                       this.ttsPrevDistance = parseFloat(this.distance);
                       this.ttsDistance = parseInt(this.distance, 10);
@@ -158,7 +169,9 @@ export class Tab1Page  {
 
   stopTracking() {
       this.isTracking = false;
-      this.ttsStats();
+      if (this.ttsActive) {
+          this.ttsStats();
+      }
       this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
       const newRoute = {finished: new Date().getTime(), path: this.trackedRoute};
       this.isTracking = false;
@@ -193,4 +206,16 @@ export class Tab1Page  {
           .then(() => console.log('Success'))
           .catch((reason: any) => console.log(reason));
   }
+    headphoneStatus() {
+        (<any> window).HeadsetDetection.detect(
+            function (detected) {
+                if (detected) {
+                    alert('Headphone connected');
+                } else {
+                    alert('No Headphone');
+                }
+                return detected;
+            });
+  }
+
 }
