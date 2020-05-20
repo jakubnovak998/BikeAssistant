@@ -45,7 +45,7 @@ export class AuthenticationService {
     }
 
     login(loginData) {
-        this.storage.set('TTS', 1);
+        this.storage.set('TTS', 0);
         this.http.post('https://' + this.ipKey + ':5000/api/login', loginData, {'Content-Type': 'application/json'})
             .then((response: any) => {
                     const data = JSON.parse(response.data);

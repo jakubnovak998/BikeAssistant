@@ -45,6 +45,7 @@ export class Tab1Page  {
               private traceService: TraceService, private tts: TextToSpeech,
               private storage: Storage) {
       setInterval(() => {this.refTime(); }, 1000 );
+      this.headphoneStatus();
   }
 
   public ngAfterViewInit() {
@@ -142,7 +143,8 @@ export class Tab1Page  {
                       lng: data.coords.longitude
                   });
                   this.distance = (Spherical.computeLength(this.trackedRoute) / 1000).toFixed(3);
-                  if (this.ttsActive === true && parseInt(this.distance, 10) > this.ttsDistance) {
+                  if (((this.ttsActive === true && this.headphones === true) || this.ttsActive === false)
+                      && parseInt(this.distance, 10) > this.ttsDistance) {
                       this.ttsStats();
                       this.ttsPrevDistance = parseFloat(this.distance);
                       this.ttsDistance = parseInt(this.distance, 10);
@@ -169,7 +171,7 @@ export class Tab1Page  {
 
   stopTracking() {
       this.isTracking = false;
-      if (this.ttsActive) {
+      if ((this.ttsActive === true && this.headphones === true) || this.ttsActive === false) {
           this.ttsStats();
       }
       this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
@@ -181,7 +183,10 @@ export class Tab1Page  {
   }
   ttsStats() {
       const timer = new Date(this.timeEnd - this.ttsTimeTemp);
-      const timeSeconds = timer.getUTCHours() * 3600 + timer.getUTCMinutes() * 60 + timer.getUTCSeconds();
+      let timeSeconds = timer.getUTCHours() * 3600 + timer.getUTCMinutes() * 60 + timer.getUTCSeconds();
+      if (timeSeconds === 0) {
+          timeSeconds = 1;
+      }
       const newDistance = parseFloat(this.distance) - parseFloat(this.ttsPrevDistance);
       let readyTime = '';
       let temp = timer.getUTCHours();
@@ -207,15 +212,22 @@ export class Tab1Page  {
           .catch((reason: any) => console.log(reason));
   }
     headphoneStatus() {
+        const that = this;
         (<any> window).HeadsetDetection.detect(
-            function (detected) {
-                if (detected) {
-                    alert('Headphone connected');
-                } else {
-                    alert('No Headphone');
-                }
-                return detected;
+            function(detected) {
+                that.headphones = detected;
             });
-  }
-
+        document.addEventListener('deviceready', function() {
+            (<any> window).HeadsetDetection.registerRemoteEvents(function(status) {
+                switch (status) {
+                    case 'headsetAdded':
+                        that.headphones = true;
+                        break;
+                    case 'headsetRemoved':
+                        that.headphones = false;
+                        break;
+                }
+            });
+        });
+    }
 }
