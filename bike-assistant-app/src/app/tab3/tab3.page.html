@@ -7,7 +7,10 @@
 </ion-header>
 
 <ion-content>
-    Insert number of kms and select period of time in which you want to reach them.
+    <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+    </ion-refresher>
+    Insert number of kms and select period of time after which you want to reach them.
     <form (ngSubmit)="createPlan()">
         <ion-item lines="full">
             <ion-label position="floating">Kms</ion-label>
@@ -15,11 +18,11 @@
         </ion-item>
         <ion-item>
             <ion-label>Period of time</ion-label>
-            <ion-select name="selectPeriod" value="day" okText="Okay" cancelText="Cancel" [(ngModel)]="planPeriod">
+            <ion-select name="selectPeriod" okText="Okay" cancelText="Cancel"  [(ngModel)]="period" (ionChange)="onChange()">
                 <ion-select-option value="day">day</ion-select-option>
                 <ion-select-option value="week">week</ion-select-option>
                 <ion-select-option value="month">month</ion-select-option>
-                <ion-select-option value="year"s>year</ion-select-option>
+                <ion-select-option value="year">year</ion-select-option>
             </ion-select>
         </ion-item>
         <ion-button expand="full" type="submit">Create a plan</ion-button>
@@ -27,7 +30,18 @@
     <div class="ion-text-center">
         <h3>Your plans: </h3>
     </div>
-    <ion-icon class="star" color="primary" name="star"></ion-icon>
-    <ion-icon class="star" color="secondary" name="star"></ion-icon>
-
+    <ion-list >
+        <ion-item *ngFor="let plan of plans">
+            <ion-icon name="bicycle"></ion-icon>
+            <div style="padding-right: 60px; padding-left: 40px;">{{plan['beginDate']}} <br> {{plan['endDate']}}
+            </div>
+            <div *ngIf="plan.realised == 0">
+                {{plan['ridden']}}km / {{plan['goal']}}km
+            </div>
+            <div *ngIf="plan.realised == 1">
+                goal: {{plan['goal']}}
+                <ion-icon style="zoom:2.0" name="trophy"></ion-icon>
+            </div>
+        </ion-item>
+    </ion-list>
 </ion-content>

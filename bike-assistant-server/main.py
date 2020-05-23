@@ -4,6 +4,7 @@ import sqlite3
 import json
 import datetime
 import secrets
+import numpy as np
 
 app = Flask(__name__)
 conn = sqlite3.connect('first.db', check_same_thread=False)
@@ -79,22 +80,6 @@ def list_users():
         return json.dumps({'STATUS': 'ERROR. API KEY NOT VALID'})
     return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
-"""
-@app.route('/api/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        mail = request.form['mail']
-        print(username,password,mail)
-        if new_user(username, password, mail) is True:
-            return json.dumps({'RESPONSE': 'SUCCESS'})
-        else:
-            return json.dumps({'RESPONSE': 'FAILED'})
-    print("")
-"""
-
-
 @app.route('/api/register', methods=['POST'])
 def register():
     if request.is_json:
@@ -160,6 +145,60 @@ def save_tracking_data():
     else:
         return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
+@app.route('/api/plan', methods=['GET', 'POST'])
+def plan():
+        if request.is_json:
+            content = request.get_json()
+            goal = content['goal']
+            user_key = content['API_KEY']
+            beginDate = content['beginDate']
+            endDate = content['endDate']
+            ridden = 0
+            user_id = get_user_id(user_key)
+            realised = 0
+
+            for dist in c.execute("select distance from trace_users where user_id = " + str(user_id)):
+                ridden += int(dist[0])
+
+            if user_id == -1:
+                return json.dumps({'RESPONSE': 'USER KEY NOT VALID'})
+            c.execute("INSERT INTO plans(user_id, beginDate, endDate, goal, ridden, realised) \
+                        VALUES(?, ? , ?, ?, ?, ?)", (user_id, beginDate, endDate, goal, ridden, realised))
+            c.execute("commit")
+            return json.dumps({'RESPONSE': 'SUCCESS'})
+
+@app.route('/api/plans/<api_key>', methods=['GET'])
+def getPlans(api_key):
+        if request.is_json:
+            user_id = get_user_id(api_key)
+            plans = []
+            today = datetime.date.today()
+            riddenNow = 0
+
+            for dist in c.execute("select distance from trace_users where user_id = " + str(user_id)):
+                riddenNow += int(dist[0])
+
+            for plan in c.execute("select * from PLANS where user_id = " + str(user_id)):
+                planArray = np.array([*plan])
+                ridden = float(planArray[5])
+                goal = float(planArray[4])
+                endDate = datetime.datetime.strptime(planArray[3], '%Y-%m-%d').date()
+
+                if riddenNow - ridden >= goal:
+                    planArray[6] = 1
+                    c.execute("UPDATE PLANS SET realised=1 WHERE plan_id = " + planArray[0])
+                    c.execute("commit")
+                else:
+                    if today >= endDate:
+                        c.execute("DELETE FROM PLANS WHERE plan_id = " + planArray[0])
+                        c.execute("commit")
+                        continue
+
+                plans.append({'beginDate': planArray[2], 'endDate': planArray[3],
+                              'goal': planArray[4], 'ridden': planArray[5], 'realised': planArray[6]})
+
+            return json.dumps({'RESPONSE': 'SUCCESS', 'plans': plans})
 
 if __name__ == "__main__":
+    #app.run(debug=True)
     app.run(host='0.0.0.0', ssl_context=('cert/cert.pem', 'cert/key.pem'))

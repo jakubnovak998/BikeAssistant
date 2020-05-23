@@ -12,7 +12,7 @@ const TOKEN_KEY = 'auth-token';
 })
 export class AuthenticationService {
     authenticationState = new BehaviorSubject(false);
-    ipKey = '10.0.2.2';
+    ipKey = '10.0.0.74';
 
     constructor(private storage: Storage, private plt: Platform, private http: HTTP, private router: Router) {
         this.plt.ready().then(() => {
