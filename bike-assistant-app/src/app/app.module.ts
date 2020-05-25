@@ -16,6 +16,7 @@ import { AppComponent } from './app.component';
 import {TabsPageModule} from './tabs/tabs.module';
 import {TabsPage} from './tabs/tabs.page';
 import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -29,6 +30,7 @@ import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
     Toast,
     HTTP,
     TextToSpeech,
+    SocialSharing,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent]
