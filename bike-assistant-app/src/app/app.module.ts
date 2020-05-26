@@ -15,6 +15,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {TabsPageModule} from './tabs/tabs.module';
 import {TabsPage} from './tabs/tabs.page';
+import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -27,6 +28,7 @@ import {TabsPage} from './tabs/tabs.page';
     GoogleMaps,
     Toast,
     HTTP,
+    TextToSpeech,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent]

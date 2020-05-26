@@ -28,7 +28,11 @@ export class Tab2Page {
     return (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
   }
   getAvgSpeed(duration, distance) {
-    const avg = parseFloat(distance) / (this.hmsToSeconds(duration) / 3600.0);
+    const dur =  this.hmsToSeconds(duration);
+    if (dur === 0) {
+        return 0;
+    }
+    const avg = parseFloat(distance) / (dur / 3600.0);
     return avg.toFixed(3);
   }
   hideShow() {
