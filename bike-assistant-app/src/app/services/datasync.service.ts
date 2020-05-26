@@ -43,5 +43,25 @@ export class TraceService {
           });
     }); });
   }
+    getTrace() {
+            return new Promise((resolve, reject) => {
+                this.api = '';
+                this.storage.get(TOKEN_KEY).then((res) => {
+                    this.api = res;
+                    const postData = {
+                        API_KEY: this.api
+                    };
+                    this.http.post('https://' + this.ipKey + ':5000/api/getHistory', postData, {'Content-Type': 'application/json'})
+                        .then((response: any) => {
+                            const data = JSON.parse(response.data);
+                            const trace = data.DATA;
+                            resolve(trace);
+                            }
+                        )
+                        .catch(error => {
+                            reject(error);
+                        });
+            }); });
+    }
 
 }
