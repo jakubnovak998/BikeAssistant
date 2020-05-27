@@ -112,13 +112,14 @@ export class Tab1Page {
         this.map.clear();
         this.traceService.getTrace().then((response: any) => {
             for (const i of response) {
-                this.map.addPolyline({
-                    points: i.TRACE,
-                    geodesic: true,
-                    color: '#DCDCDC',
-                    strokeWeight: 2
-                });
-
+                if (i.TRACE.length() !== 0) {
+                    this.map.addPolyline({
+                        points: i.TRACE,
+                        geodesic: true,
+                        color: '#DCDCDC',
+                        strokeWeight: 2
+                    });
+                }
             }
         });
         this.storage.get('TTS').then((res) => {
@@ -181,12 +182,13 @@ export class Tab1Page {
         if ((this.ttsActive === true && this.headphones === true) || this.ttsActive === false) {
             this.ttsStats();
         }
-        this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
+        if (this.trackedRoute.length !== 0) {
+            this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
+        }
         const newRoute = {finished: new Date().getTime(), path: this.trackedRoute};
         this.isTracking = false;
         this.positionSubscritpion.unsubscribe();
         this.currentMapTrack.setMap(null);
-
     }
 
     ttsStats() {
