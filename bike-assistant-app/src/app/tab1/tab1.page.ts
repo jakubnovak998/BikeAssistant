@@ -112,7 +112,7 @@ export class Tab1Page {
         this.map.clear();
         this.traceService.getTrace().then((response: any) => {
             for (const i of response) {
-                if (i.TRACE.length() !== 0) {
+                if (i.TRACE.length !== 0) {
                     this.map.addPolyline({
                         points: i.TRACE,
                         geodesic: true,
