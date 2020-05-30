@@ -9,10 +9,12 @@ import {Storage} from '@ionic/storage';
   styleUrls: ['./tab4.page.scss'],
 })
 export class Tab4Page implements OnInit {
-
-  constructor(private authService: AuthenticationService, private localNotifications: LocalNotifications) {}
-
+  ttsActive = false;
   isScheduled = false;
+
+  constructor(private authService: AuthenticationService, private localNotifications: LocalNotifications, private storage: Storage) {
+    this.getTTS();
+  }
 
   ngOnInit() {
     this.localNotifications.isScheduled(1).then((isScheduled) => {
@@ -20,10 +22,6 @@ export class Tab4Page implements OnInit {
     });
   }
 
-  ttsActive = false;
-  constructor(private authService: AuthenticationService, private storage: Storage) {
-    this.getTTS();
-  }
   getTTS() {
     this.storage.get('TTS').then((res) => {
       if (res === 1) {
