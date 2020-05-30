@@ -8,25 +8,34 @@
 </ion-header>
 
 <ion-content>
-  <form (ngSubmit)="onSubmit()">
+  <form (ngSubmit)="onSubmit()"  [formGroup]="validationsRegisterForm">
     <ion-item lines="full">
       <ion-label position="floating">User Name</ion-label>
-      <ion-input type="text" required name="name" [(ngModel)]="name"></ion-input>
+      <ion-input type="text" formControlName="username" required name="name" [(ngModel)]="name"></ion-input>
     </ion-item>
+    <ion-label color="danger" *ngIf="getFormControl('username').invalid && (getFormControl('username').dirty || getFormControl('username').touched)">
+      username invalid [7 to 20 characters which contain only characters, numeric digits, underscore and first character must be a letter]
+    </ion-label>
 
     <ion-item lines="full">
       <ion-label position="floating">Email</ion-label>
-      <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
+      <ion-input type="email"  formControlName="email" [(ngModel)]="email" name="email" required></ion-input>
     </ion-item>
+    <ion-label color="danger" *ngIf="getFormControl('email').invalid && (getFormControl('email').dirty || getFormControl('email').touched)">
+      email invalid
+    </ion-label>
 
     <ion-item lines="full">
       <ion-label position="floating">Password</ion-label>
-      <ion-input type="password" name="password" [(ngModel)]="password" required></ion-input>
+      <ion-input type="password"  formControlName="password" name="password" [(ngModel)]="password" required></ion-input>
     </ion-item>
+    <ion-label color="danger" *ngIf="getFormControl('password').invalid && (getFormControl('password').dirty || getFormControl('password').touched)">
+      password invalid [7 to 15 characters which contain only characters, numeric digits, underscore and first character must be a letter]
+    </ion-label>
 
     <ion-row>
       <ion-col>
-        <ion-button type="submit" color="danger" expand="block">Sign Up</ion-button>
+        <ion-button type="submit" color="danger" expand="block" [disabled]="!validationsRegisterForm.valid">Sign Up</ion-button>
       </ion-col>
     </ion-row>
   </form>

@@ -1,12 +1,21 @@
 <ion-header>
     <ion-toolbar>
         <ion-title>
-            User
+            User Settings
         </ion-title>
     </ion-toolbar>
 </ion-header>
 
 <ion-content>
-    <button  (click)="logout()">Logout</button>
+    <ion-button class="btn-logout" color="danger" (click)="logout()">Logout</ion-button>
+    <ion-item>
+        <ion-label *ngIf="isScheduled">
+            Notifications Scheduled
+        </ion-label>
+        <ion-label *ngIf="!isScheduled">
+            Notifications Unscheduled
+        </ion-label>
+        <ion-button color="danger" (click)="toggleNotifications()">Toggle</ion-button>
+    </ion-item>
 </ion-content>
 

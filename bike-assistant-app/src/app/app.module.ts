@@ -9,6 +9,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { GoogleMaps } from '@ionic-native/google-maps/ngx';
 import { Toast } from '@ionic-native/toast/ngx';
 import { HTTP } from '@ionic-native/http/ngx';
+import { LocalNotifications} from '@ionic-native/local-notifications/ngx';
 
 import { IonicStorageModule } from '@ionic/storage';
 import { AppRoutingModule } from './app-routing.module';
@@ -27,6 +28,7 @@ import {TabsPage} from './tabs/tabs.page';
     GoogleMaps,
     Toast,
     HTTP,
+    LocalNotifications,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent]

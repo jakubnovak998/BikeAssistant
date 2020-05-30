@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {HTTP} from '@ionic-native/http/ngx';
 import {AuthenticationService} from '../services/authentication.service';
+import { Validators, FormBuilder, FormGroup, FormControl } from '@angular/forms';
 
 @Component({
     selector: 'app-registration',
@@ -11,11 +12,31 @@ export class RegistrationPage implements OnInit {
     name = '';
     email = '';
     password = '';
+    validationsRegisterForm;
 
-    constructor(private http: HTTP, private authService: AuthenticationService) {
+    constructor(private http: HTTP, private authService: AuthenticationService, private formBuilder: FormBuilder) {
     }
 
     ngOnInit() {
+        this.validationsRegisterForm = this.formBuilder.group({
+            username: new FormControl('', Validators.compose([
+                Validators.required,
+                Validators.pattern('^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$')
+            ])),
+            password: new FormControl('', Validators.compose([
+                Validators.required,
+                Validators.pattern('^[A-Za-z]\\w{7,14}$')
+            ])),
+            email: new FormControl('', Validators.compose([
+                Validators.required,
+                Validators.pattern('^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)' +
+                    '|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$')
+            ])),
+        });
+    }
+
+    getFormControl(name) {
+        return this.validationsRegisterForm.get(name);
     }
 
     async onSubmit() {
