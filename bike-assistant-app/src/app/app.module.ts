@@ -16,6 +16,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {TabsPageModule} from './tabs/tabs.module';
 import {TabsPage} from './tabs/tabs.page';
+import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -29,6 +31,8 @@ import {TabsPage} from './tabs/tabs.page';
     Toast,
     HTTP,
     LocalNotifications,
+    TextToSpeech,
+    SocialSharing,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent]

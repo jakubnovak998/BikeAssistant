@@ -6,6 +6,8 @@ import {
   Marker,
   GoogleMapOptions
 } from '@ionic-native/google-maps/ngx';
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
+import {Storage} from '@ionic/storage';
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
@@ -18,7 +20,7 @@ export class Tab2Page {
   trace = [];
   private map: GoogleMap;
   marker: Marker;
-  constructor(private traceService: TraceService) {
+  constructor(private traceService: TraceService, private socialSharing: SocialSharing) {
     this.traceService.getTrace().then((response: any) => {
       this.history = response;
     });
@@ -28,7 +30,11 @@ export class Tab2Page {
     return (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
   }
   getAvgSpeed(duration, distance) {
-    const avg = parseFloat(distance) / (this.hmsToSeconds(duration) / 3600.0);
+    const dur =  this.hmsToSeconds(duration);
+    if (dur === 0) {
+        return 0;
+    }
+    const avg = parseFloat(distance) / (dur / 3600.0);
     return avg.toFixed(3);
   }
   hideShow() {
@@ -80,5 +86,25 @@ export class Tab2Page {
     setTimeout(() => {
       event.target.complete();
     }, 2000);
+  }
+  shareStats(mode, date, duration, distance) {
+    const message = date + ' I reached ' + distance + ' km in ' + duration;
+    switch (mode) {
+      case 1:
+        this.socialSharing.shareViaFacebook(message, null, null).catch(error => {
+          console.log(error);
+        });
+        break;
+      case 2:
+        this.socialSharing.shareViaTwitter(message, null, null).catch(error => {
+          console.log(error);
+        });
+        break;
+      case 3:
+        this.socialSharing.share(message, null, null, null).catch(error => {
+          console.log(error);
+        });
+        break;
+    }
   }
 }

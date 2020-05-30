@@ -10,6 +10,17 @@
         <div style="height: 80%;width: 100%" id="map_canvas"></div>
     <button ion-button full *ngIf="!isTracking" (click)="startTracking()">Start</button>
     <button ion-button full *ngIf="isTracking" (click)="stopTracking()">Stop</button>
+    <ion-buttons *ngIf="isTracking===false&&trackedRoute.length>0">
+        <ion-button size="small" (click)="shareStats(1)">
+            <ion-icon name="logo-facebook"></ion-icon>
+        </ion-button>
+        <ion-button size="small" (click)="shareStats(2)">
+            <ion-icon name="logo-twitter"></ion-icon>
+        </ion-button>
+        <ion-button size="small" (click)="shareStats(3)">
+            <ion-icon name="share-social-sharp"></ion-icon>
+        </ion-button>
+    </ion-buttons>
     <ion-item>
         <ion-label>
             Duration {{duration}}
