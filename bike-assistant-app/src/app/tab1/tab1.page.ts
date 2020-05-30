@@ -15,7 +15,8 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import {TraceService} from '../services/datasync.service';
-
+import { AudioManagement } from '@ionic-native/audio-management/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
@@ -34,12 +35,34 @@ export class Tab1Page  {
   duration = '00:00:00';
   distance = '0.0';
   speed = '0.0';
+  currentNotification = 0;
+
   constructor(private platform: Platform, private navController: NavController,
               private geoLocation: Geolocation, private toastCtrl: ToastController,
-              private traceService: TraceService) {
+              private traceService: TraceService , public audioman: AudioManagement,
+              private androidPermissions: AndroidPermissions) {
       setInterval(() => {this.refTime(); }, 1000 );
+      platform.ready().then(() => {
+          androidPermissions.requestPermissions(
+              [ androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS
+
+
+              ]
+          );
+      });
   }
 
+
+
+    setAudioModeTurnof(a) {
+        this.audioman.setVolume(AudioManagement.VolumeType.NOTIFICATION, a)
+            .then(() => {
+                console.log('Device audio mode is now NOTIFICATION');
+            })
+            .catch((reason) => {
+                console.log(reason);
+            });
+    }
   public ngAfterViewInit() {
     this.platform.ready().then(() => this.initMap());
   }
@@ -94,6 +117,11 @@ export class Tab1Page  {
   }
 
   startTracking() {
+      this.audioman.getVolume(AudioManagement.VolumeType.RING)
+          .then(result => {
+              this.currentNotification = result.volume;
+              this.setAudioModeTurnof(0);
+          });
       this.map.clear();
       this.traceService.getTrace().then((response: any) => {
           for (const i of response) {
@@ -105,6 +133,7 @@ export class Tab1Page  {
               });
 
           }
+
       });
       this.timeStart = new Date();
       this.duration = '00:00:00';
@@ -128,6 +157,10 @@ export class Tab1Page  {
                   this.speed = (Number.isNaN(data.coords.speed) ? 0 : (data.coords.speed * 3.6)).toFixed(3);
               });
           });
+
+
+
+
   }
 
   redraw(path) {
@@ -151,6 +184,10 @@ export class Tab1Page  {
       this.isTracking = false;
       this.positionSubscritpion.unsubscribe();
       this.currentMapTrack.setMap(null);
-
+      this.setAudioModeTurnof(this.currentNotification);
   }
+
 }
+
+
+

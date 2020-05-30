@@ -19,11 +19,11 @@
         <ion-item >
             <ion-label style=" text-align: center; ">
                 <ion-button style="width: 50px; text-align: center;" size="small" color="success"   *ngIf="!isTracking" (click)="startTracking()">START</ion-button>
-                <ion-button style=";width: 50px; text-align: center;"  size="small" color="danger"   *ngIf="isTracking" (click)="stopTracking()"> STOP </ion-button>
+                <ion-button style="width: 50px; text-align: center;"  size="small" color="danger"   *ngIf="isTracking" (click)="stopTracking()"> STOP </ion-button>
             </ion-label>
             <ion-label style=" text-align: center; ">{{duration}}</ion-label>
-            <ion-label style=" text-align: center; ">{{distance}} [km]</ion-label>
-            <ion-label style=" text-align: center; ">{{speed}} [km/h]</ion-label>
+            <ion-label style=" text-align: center; ">{{distance}} <br> [km]</ion-label>
+            <ion-label style=" text-align: center; ">{{speed}} <br> [km/h]</ion-label>
         </ion-item>
     </div>
 </ion-content>

@@ -15,7 +15,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {TabsPageModule} from './tabs/tabs.module';
 import {TabsPage} from './tabs/tabs.page';
-
+import { AudioManagement } from '@ionic-native/audio-management/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -27,6 +28,8 @@ import {TabsPage} from './tabs/tabs.page';
     GoogleMaps,
     Toast,
     HTTP,
+    AudioManagement,
+    AndroidPermissions,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   ],
   bootstrap: [AppComponent]

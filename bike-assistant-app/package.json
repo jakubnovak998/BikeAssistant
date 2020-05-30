@@ -20,6 +20,8 @@
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
     "@capacitor/core": "1.5.1",
+    "@ionic-native/android-permissions": "^5.26.0",
+    "@ionic-native/audio-management": "^5.26.0",
     "@ionic-native/core": "^5.22.0-beta-1",
     "@ionic-native/geolocation": "^5.23.0",
     "@ionic-native/google-maps": "^5.0.0-beta.27",
@@ -30,9 +32,11 @@
     "@ionic/angular": "^5.0.0",
     "@ionic/storage": "^2.2.0",
     "browse": "0.4.0",
+    "clovelced-plugin-audiomanagement": "^1.0.2",
     "cordova-android": "^8.1.0",
     "cordova-browser": "^6.0.0",
     "cordova-plugin-advanced-http": "^2.4.1",
+    "cordova-plugin-android-permissions": "^1.0.2",
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-geolocation": "^4.0.2",
     "cordova-plugin-googlemaps": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps.git#multiple_maps",
@@ -93,7 +97,9 @@
       "cordova-sqlite-storage": {},
       "cordova-plugin-advanced-http": {
         "OKHTTP_VERSION": "3.10.0"
-      }
+      },
+      "clovelced-plugin-audiomanagement": {},
+      "cordova-plugin-android-permissions": {}
     },
     "platforms": [
       "browser",
