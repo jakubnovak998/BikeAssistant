@@ -5,52 +5,61 @@ import json
 import datetime
 import secrets
 import numpy as np
+import re
 
 app = Flask(__name__)
 conn = sqlite3.connect('first.db', check_same_thread=False)
 # id autoincrement, username unique, password, email, join_date
-c = conn.cursor()
 
 
 def new_user(username, password, mail):
+    if re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', mail) is None:
+        return False
+    if len(username) < 3 or len(password) < 3:
+        return False
+    c = conn.cursor()
     try:
         c.execute("INSERT INTO USERS(username,password,mail,join_date) \
     VALUES(?, ? ,?, ?)", (username, password, mail, str(datetime.date.today())))
     except sqlite3.Error:
         return False
-    c.execute("commit")
+    conn.commit()
+    c.close()
     return True
 
 
 def login_user(username, password):
     user_list = []
+    c = conn.cursor()
     for row in c.execute("select username from USERS"):
         user_list.append(row[0])
     if username in user_list:
         c.execute('select password from USERS where username= ?;', (username,))
         passwords_db = c.fetchone()[0]
-        print(passwords_db)
+        c.close()
         if password == passwords_db:
             return True
         return False
 
 
 def gen_api_key(username):
+    c = conn.cursor()
     c.execute("select user_id from users where username= ?", (username,))
     user_id = c.fetchone()[0]
-    print(user_id)
     c.execute("DELETE FROM API_KEYS WHERE user_id= ?", (user_id,))
     api = secrets.token_hex(16)
     c.execute("INSERT INTO API_KEYS(user_id,api_key) VALUES(?, ?)", (user_id, api))
-    c.execute('commit')
+    conn.commit()
+    c.close()
     return api
 
 
 def check_api_key(user_key):
     user_id = []
+    c = conn.cursor()
     for row in c.execute("select api_key from api_keys"):
         user_id.append(row[0])
-    print(user_id)
+    c.close()
     if user_key in user_id:
         return True
     else:
@@ -58,7 +67,7 @@ def check_api_key(user_key):
 
 
 def get_user_id(user_key):
-    user_id = 0
+    c = conn.cursor()
     c.execute("select u.user_id from users u join api_keys k on k.user_id=u.user_id "
               "where api_key ='" + user_key + "';")
     user_id = (c.fetchone())
@@ -70,31 +79,30 @@ def get_user_id(user_key):
 @app.route('/api/list', methods=['POST'])
 def list_users():
     if request.is_json:
+        c = conn.cursor()
         user_list = []
         content = request.get_json()
         if check_api_key(content['API_KEY']) is True:
             for row in c.execute("select username from USERS"):
-                # print(row[0])
                 user_list.append(row[0])
+            c.close()
             return json.dumps({'users': user_list})
         return json.dumps({'STATUS': 'ERROR. API KEY NOT VALID'})
     return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
+
 
 @app.route('/api/register', methods=['POST'])
 def register():
     if request.is_json:
         content = request.get_json()
-        print(content)
         username = content['username']
         password = content['password']
-        mail = content['mail']
-        print(username, password, mail)
+        mail = content['mail'].lower()
         if new_user(username, password, mail) is True:
             return json.dumps({'RESPONSE': 'SUCCESS'})
         else:
             return json.dumps({'RESPONSE': 'FAILED'})
     else:
-        print("THIS IS NOT JSON")
         return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
 
@@ -102,16 +110,13 @@ def register():
 def login():
     if request.is_json:
         content = request.get_json()
-        print(content)
         username = content['username']
         password = content['password']
-        print(username, password)
         if login_user(username, password) is True:
             return json.dumps({'RESPONSE': 'SUCCESS', 'API_KEY': gen_api_key(username)})
         else:
             return json.dumps({'RESPONSE': 'FAILED'})
     else:
-        print("THIS IS NOT JSON")
         return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
 
@@ -119,7 +124,6 @@ def login():
 def save_tracking_data():
     if request.is_json:
         content = request.get_json()
-        print(content)
         user_key = content['API_KEY']
         trace = content['TRACE']
         date = content['DATE']
@@ -128,26 +132,27 @@ def save_tracking_data():
         user_id = get_user_id(user_key)
         if user_id == -1:
             return json.dumps({'RESPONSE': 'USER KEY NOT VALID'})
+        c = conn.cursor()
         c.execute("INSERT INTO trace_users(user_id,date,duration,distance) \
             VALUES(?, ? ,?,?)", (user_id, date, duration, distance))
-        c.execute("commit")
+        conn.commit()
         c.execute("select last_insert_rowid();")
         trace_id = c.fetchone()[0]
-        print(trace_id)
         for i in range(0, len(trace)):
             c.execute("INSERT INTO trace(trace_id,idx,lat,lng) \
                         VALUES(?, ? ,?,?)",
                       (trace_id, i + 1, trace[i]['lat'], trace[i]['lng']))
-            print(i)
-        c.execute("commit")
+        conn.commit()
+        c.close()
         return json.dumps({'RESPONSE': 'SUCCESS'})
-
     else:
         return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
+
 
 @app.route('/api/plan', methods=['GET', 'POST'])
 def plan():
         if request.is_json:
+            c = conn.cursor()
             content = request.get_json()
             goal = content['goal']
             user_key = content['API_KEY']
@@ -156,16 +161,19 @@ def plan():
             ridden = 0
             user_id = get_user_id(user_key)
             realised = 0
-
             for dist in c.execute("select distance from trace_users where user_id = " + str(user_id)):
-                ridden += int(dist[0])
+                ridden += float(dist[0])
 
+            ridden = int(ridden)
             if user_id == -1:
+                c.close()
                 return json.dumps({'RESPONSE': 'USER KEY NOT VALID'})
             c.execute("INSERT INTO plans(user_id, beginDate, endDate, goal, ridden, realised) \
                         VALUES(?, ? , ?, ?, ?, ?)", (user_id, beginDate, endDate, goal, ridden, realised))
-            c.execute("commit")
+            conn.commit()
+            c.close()
             return json.dumps({'RESPONSE': 'SUCCESS'})
+
 
 @app.route('/api/plans/<api_key>', methods=['GET'])
 def getPlans(api_key):
@@ -174,42 +182,47 @@ def getPlans(api_key):
             plans = []
             today = datetime.date.today()
             riddenNow = 0
-
+            c = conn.cursor()
+            d = conn.cursor()
             for dist in c.execute("select distance from trace_users where user_id = " + str(user_id)):
-                riddenNow += int(dist[0])
+                riddenNow += float(dist[0])
+            riddenNow = int(riddenNow)
 
             for plan in c.execute("select * from PLANS where user_id = " + str(user_id)):
                 planArray = np.array([*plan])
                 ridden = float(planArray[5])
                 goal = float(planArray[4])
                 endDate = datetime.datetime.strptime(planArray[3], '%Y-%m-%d').date()
-
+                if riddenNow > ridden:
+                    d.execute("UPDATE PLANS SET ridden= " + str(riddenNow) + " WHERE plan_id = " + planArray[0])
+                    conn.commit()
                 if riddenNow - ridden >= goal:
                     planArray[6] = 1
-                    c.execute("UPDATE PLANS SET realised=1 WHERE plan_id = " + planArray[0])
-                    c.execute("commit")
+                    d.execute("UPDATE PLANS SET realised=1 WHERE plan_id = " + planArray[0])
+                    conn.commit()
                 else:
                     if today >= endDate:
-                        c.execute("DELETE FROM PLANS WHERE plan_id = " + planArray[0])
-                        c.execute("commit")
+                        d.execute("DELETE FROM PLANS WHERE plan_id = " + planArray[0])
+                        conn.commit()
                         continue
 
                 plans.append({'beginDate': planArray[2], 'endDate': planArray[3],
-                              'goal': planArray[4], 'ridden': planArray[5], 'realised': planArray[6]})
-
+                              'goal': planArray[4], 'ridden': riddenNow, 'realised': planArray[6]})
+            c.close()
             return json.dumps({'RESPONSE': 'SUCCESS', 'plans': plans})
+
 
 @app.route('/api/getHistory', methods=['GET', 'POST'])
 def get_tracking_data():
     if request.is_json:
         content = request.get_json()
-        print(content)
         user_key = content['API_KEY']
         user_id = get_user_id(user_key)
         if user_id == -1:
             return json.dumps({'RESPONSE': 'USER KEY NOT VALID'})
         history = []
         temp = []
+        c = conn.cursor()
         d = conn.cursor()
         for row in c.execute("select * from trace_users where user_id = " + str(user_id)):
             temp.append(row)
@@ -221,12 +234,12 @@ def get_tracking_data():
                 temp.append(row2)
                 trace.append({'lat': temp[-1][0], 'lng': temp[-1][1]})
             history[-1]['TRACE'] = trace
-        print(history)
+        c.close()
+        d.close()
         return json.dumps({'RESPONSE': 'SUCCESS', 'DATA': history})
     else:
         return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
 
 if __name__ == "__main__":
-    #app.run(debug=True)
     app.run(host='0.0.0.0', ssl_context=('cert/cert.pem', 'cert/key.pem'))
