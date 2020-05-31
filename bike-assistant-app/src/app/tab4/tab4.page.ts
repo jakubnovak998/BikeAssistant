@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthenticationService} from '../services/authentication.service';
+import {LocalNotifications} from '@ionic-native/local-notifications/ngx';
 import {Storage} from '@ionic/storage';
 
 @Component({
@@ -8,11 +9,19 @@ import {Storage} from '@ionic/storage';
   styleUrls: ['./tab4.page.scss'],
 })
 export class Tab4Page implements OnInit {
-
   ttsActive = false;
-  constructor(private authService: AuthenticationService, private storage: Storage) {
+  isScheduled = false;
+
+  constructor(private authService: AuthenticationService, private localNotifications: LocalNotifications, private storage: Storage) {
     this.getTTS();
   }
+
+  ngOnInit() {
+    this.localNotifications.isScheduled(1).then((isScheduled) => {
+      this.isScheduled = isScheduled;
+    });
+  }
+
   getTTS() {
     this.storage.get('TTS').then((res) => {
       if (res === 1) {
@@ -40,7 +49,32 @@ export class Tab4Page implements OnInit {
     this.authService.logout();
   }
 
-  ngOnInit() {
+  scheduleNotification() {
+    this.localNotifications.schedule({
+      id: 1,
+      title: 'BikeAssistant',
+      text: 'There is next week of cycling waiting for You !',
+      trigger: { count: 1, every: { weekday: 7, hour: 20, minute: 0 } },
+    });
+    this.isScheduled = !this.isScheduled;
+  }
+
+  cancelNotification() {
+  this.localNotifications.cancelAll()
+      .then(response => {
+        this.isScheduled = !this.isScheduled;
+      }
+      ).catch(error => {
+        console.log(error);
+      });
+  }
+
+  toggleNotifications() {
+    if (this.isScheduled) {
+      this.cancelNotification();
+    } else {
+      this.scheduleNotification();
+    }
   }
 
 }

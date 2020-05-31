@@ -8,20 +8,26 @@
 </ion-header>
 
 <ion-content>
-  <form (ngSubmit)="login()">
+  <form (ngSubmit)="login()" [formGroup]="validationsLoginForm">
     <ion-item lines="full">
       <ion-label position="floating">Username</ion-label>
-      <ion-input name="username" type="text" [(ngModel)]="username" required></ion-input>
+      <ion-input name="username" formControlName="username" type="text" [(ngModel)]="username" required></ion-input>
     </ion-item>
+    <ion-label color="danger" *ngIf="getFormControl('username').invalid && (getFormControl('username').dirty || getFormControl('username').touched)">
+      username invalid [7 to 20 characters which contain only characters, numeric digits, underscore and first character must be a letter]
+    </ion-label>
 
     <ion-item lines="full">
       <ion-label position="floating">Password</ion-label>
-      <ion-input name="password" type="password" [(ngModel)]="password" required></ion-input>
+      <ion-input name="password" formControlName="password" type="password" [(ngModel)]="password" required></ion-input>
     </ion-item>
+    <ion-label color="danger" *ngIf="getFormControl('password').invalid && (getFormControl('password').dirty || getFormControl('password').touched)">
+      password invalid [7 to 15 characters which contain only characters, numeric digits, underscore and first character must be a letter]
+    </ion-label>
 
     <ion-row>
       <ion-col>
-        <ion-button type="submit" color="danger" expand="block">Sign In</ion-button>
+        <ion-button type="submit" color="danger" expand="block" [disabled]="!validationsLoginForm.valid">Sign In</ion-button>
       </ion-col>
     </ion-row>
   </form>
