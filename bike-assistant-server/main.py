@@ -196,7 +196,7 @@ def getPlans(api_key):
                 if riddenNow > ridden:
                     d.execute("UPDATE PLANS SET ridden= " + str(riddenNow) + " WHERE plan_id = " + planArray[0])
                     conn.commit()
-                if riddenNow - ridden >= goal:
+                if riddenNow >= goal:
                     planArray[6] = 1
                     d.execute("UPDATE PLANS SET realised=1 WHERE plan_id = " + planArray[0])
                     conn.commit()
