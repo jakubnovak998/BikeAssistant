@@ -10,7 +10,7 @@ import {HTTP} from '@ionic-native/http/ngx';
 export class Tab3Page {
 
   constructor(private storage: Storage, private http: HTTP) {}
-  ipKey = '10.0.0.74';
+  ipKey = '10.0.2.2';
   planValue = 0;
   beginDate = new Date ();
   endDate = new Date(this.beginDate.getFullYear() - 2, this.beginDate.getMonth() + 22, this.beginDate.getDate() + 63);

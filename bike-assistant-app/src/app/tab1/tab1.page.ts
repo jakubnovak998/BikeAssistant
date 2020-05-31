@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   ToastController,
   Platform,
@@ -179,16 +179,12 @@ export class Tab1Page {
 
     stopTracking() {
         this.isTracking = false;
-        if ((this.ttsActive === true && this.headphones === true) || this.ttsActive === false) {
-            this.ttsStats();
-        }
         if (this.trackedRoute.length !== 0) {
             this.traceService.saveTrace(this.trackedRoute, this.timeEnd.toISOString().substr(0, 10), this.distance, this.duration);
         }
         const newRoute = {finished: new Date().getTime(), path: this.trackedRoute};
         this.isTracking = false;
         this.positionSubscritpion.unsubscribe();
-        this.currentMapTrack.setMap(null);
     }
 
     ttsStats() {
