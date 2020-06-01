@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import {
-  ToastController,
-  Platform,
-  NavController
+    ToastController,
+    Platform,
+    NavController
 } from '@ionic/angular';
 import {
     GoogleMaps,
@@ -18,10 +18,12 @@ import {TraceService} from '../services/datasync.service';
 import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
 import {Storage} from '@ionic/storage';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
+import { AudioManagement } from '@ionic-native/audio-management/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 @Component({
-  selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss']
+    selector: 'app-tab1',
+    templateUrl: 'tab1.page.html',
+    styleUrls: ['tab1.page.scss']
 })
 export class Tab1Page {
     private map: GoogleMap;
@@ -41,15 +43,37 @@ export class Tab1Page {
     ttsTimeTemp;
     ttsActive = true;
     headphones;
+    currentNotification = 0;
+
 
     constructor(private platform: Platform, private navController: NavController,
                 private geoLocation: Geolocation, private toastCtrl: ToastController,
                 private traceService: TraceService, private tts: TextToSpeech,
-                private storage: Storage, private socialSharing: SocialSharing) {
+                private storage: Storage, private socialSharing: SocialSharing,
+                public audioman: AudioManagement,
+                private androidPermissions: AndroidPermissions) {
+        platform.ready().then(() => {
+            androidPermissions.requestPermissions(
+                [ androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS
+
+
+                ]
+            );
+        });
         setInterval(() => {
             this.refTime();
         }, 1000);
-        this.headphoneStatus();
+      //  this.headphoneStatus();
+    }
+
+    setAudioModeTurnof(a) {
+        this.audioman.setVolume(AudioManagement.VolumeType.NOTIFICATION, a)
+            .then(() => {
+                console.log('Device audio mode is now NOTIFICATION');
+            })
+            .catch((reason) => {
+                console.log(reason);
+            });
     }
 
     public ngAfterViewInit() {
@@ -109,6 +133,11 @@ export class Tab1Page {
     }
 
     startTracking() {
+        this.audioman.getVolume(AudioManagement.VolumeType.RING)
+            .then(result => {
+                this.currentNotification = result.volume;
+                this.setAudioModeTurnof(0);
+            });
         this.map.clear();
         this.traceService.getTrace().then((response: any) => {
             for (const i of response) {
@@ -185,6 +214,7 @@ export class Tab1Page {
         const newRoute = {finished: new Date().getTime(), path: this.trackedRoute};
         this.isTracking = false;
         this.positionSubscritpion.unsubscribe();
+        this.setAudioModeTurnof(this.currentNotification);
     }
 
     ttsStats() {
@@ -217,8 +247,7 @@ export class Tab1Page {
             .then(() => console.log('Success'))
             .catch((reason: any) => console.log(reason));
     }
-
-    headphoneStatus() {
+    /* headphoneStatus() {
         const that = this;
         (<any> window).HeadsetDetection.detect(
             function(detected) {
@@ -238,6 +267,7 @@ export class Tab1Page {
         });
     }
 
+     */
     shareStats(mode) {
         const message = 'Today I reached ' + this.distance + ' km in ' + this.duration;
         switch (mode) {
@@ -253,7 +283,7 @@ export class Tab1Page {
                 break;
             case 3:
                 this.socialSharing.share(message, null, null, null).catch(error => {
-                console.log(error);
+                    console.log(error);
                 });
                 break;
         }
