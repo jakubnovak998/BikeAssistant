@@ -58,6 +58,11 @@
         </ion-button>
 
     </ion-buttons>
-
+    <ion-list>
+      <ion-item>Date: {{temp['DATE']}}</ion-item>
+      <ion-item>Duration: {{temp['DURATION']}}</ion-item>
+      <ion-item>Distance: {{temp['DISTANCE']}}</ion-item>
+      <ion-item>Speed: {{getAvgSpeed(temp['DURATION'],temp['DISTANCE'])}}</ion-item>
+    </ion-list>
   </ion-content>
 </ion-content>
