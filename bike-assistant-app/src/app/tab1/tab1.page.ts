@@ -63,7 +63,7 @@ export class Tab1Page {
         setInterval(() => {
             this.refTime();
         }, 1000);
-      //  this.headphoneStatus();
+        this.headphoneStatus();
     }
 
     setAudioModeTurnof(a) {
@@ -247,7 +247,7 @@ export class Tab1Page {
             .then(() => console.log('Success'))
             .catch((reason: any) => console.log(reason));
     }
-    /* headphoneStatus() {
+     headphoneStatus() {
         const that = this;
         (<any> window).HeadsetDetection.detect(
             function(detected) {
@@ -267,7 +267,7 @@ export class Tab1Page {
         });
     }
 
-     */
+
     shareStats(mode) {
         const message = 'Today I reached ' + this.distance + ' km in ' + this.duration;
         switch (mode) {
