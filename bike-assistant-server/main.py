@@ -13,9 +13,13 @@ conn = sqlite3.connect('first.db', check_same_thread=False)
 
 
 def new_user(username, password, mail):
-    if re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', mail) is None:
+    if re.match('^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)' +
+                    '|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|' +
+                    '(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$', mail) is None:
         return False
-    if len(username) < 3 or len(password) < 3:
+    if re.match('^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$', username) is None:
+        return False
+    if re.match('^[A-Za-z]\\w{7,14}$', password) is None:
         return False
     c = conn.cursor()
     try:
@@ -76,21 +80,6 @@ def get_user_id(user_key):
     return user_id[0]
 
 
-@app.route('/api/list', methods=['POST'])
-def list_users():
-    if request.is_json:
-        c = conn.cursor()
-        user_list = []
-        content = request.get_json()
-        if check_api_key(content['API_KEY']) is True:
-            for row in c.execute("select username from USERS"):
-                user_list.append(row[0])
-            c.close()
-            return json.dumps({'users': user_list})
-        return json.dumps({'STATUS': 'ERROR. API KEY NOT VALID'})
-    return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
-
-
 @app.route('/api/register', methods=['POST'])
 def register():
     if request.is_json:
@@ -145,6 +134,35 @@ def save_tracking_data():
         conn.commit()
         c.close()
         return json.dumps({'RESPONSE': 'SUCCESS'})
+    else:
+        return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
+
+
+@app.route('/api/getHistory', methods=['GET', 'POST'])
+def get_tracking_data():
+    if request.is_json:
+        content = request.get_json()
+        user_key = content['API_KEY']
+        user_id = get_user_id(user_key)
+        if user_id == -1:
+            return json.dumps({'RESPONSE': 'USER KEY NOT VALID'})
+        history = []
+        temp = []
+        c = conn.cursor()
+        d = conn.cursor()
+        for row in c.execute("select * from trace_users where user_id = " + str(user_id)):
+            temp.append(row)
+            history.append({'DATE': temp[-1][2], 'DURATION': temp[-1][3], 'DISTANCE': temp[-1][4], 'TRACE': temp[-1][0]})
+            trace_id = history[-1]['TRACE']
+            temp = []
+            trace = []
+            for row2 in d.execute("select lat,lng from trace where trace_id = " + str(trace_id) + " order by idx"):
+                temp.append(row2)
+                trace.append({'lat': temp[-1][0], 'lng': temp[-1][1]})
+            history[-1]['TRACE'] = trace
+        c.close()
+        d.close()
+        return json.dumps({'RESPONSE': 'SUCCESS', 'DATA': history})
     else:
         return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
@@ -210,35 +228,6 @@ def getPlans(api_key):
                               'goal': planArray[4], 'ridden': riddenNow, 'realised': planArray[6]})
             c.close()
             return json.dumps({'RESPONSE': 'SUCCESS', 'plans': plans})
-
-
-@app.route('/api/getHistory', methods=['GET', 'POST'])
-def get_tracking_data():
-    if request.is_json:
-        content = request.get_json()
-        user_key = content['API_KEY']
-        user_id = get_user_id(user_key)
-        if user_id == -1:
-            return json.dumps({'RESPONSE': 'USER KEY NOT VALID'})
-        history = []
-        temp = []
-        c = conn.cursor()
-        d = conn.cursor()
-        for row in c.execute("select * from trace_users where user_id = " + str(user_id)):
-            temp.append(row)
-            history.append({'DATE': temp[-1][2], 'DURATION': temp[-1][3], 'DISTANCE': temp[-1][4], 'TRACE': temp[-1][0]})
-            trace_id = history[-1]['TRACE']
-            temp = []
-            trace = []
-            for row2 in d.execute("select lat,lng from trace where trace_id = " + str(trace_id) + " order by idx"):
-                temp.append(row2)
-                trace.append({'lat': temp[-1][0], 'lng': temp[-1][1]})
-            history[-1]['TRACE'] = trace
-        c.close()
-        d.close()
-        return json.dumps({'RESPONSE': 'SUCCESS', 'DATA': history})
-    else:
-        return json.dumps({'RESPONSE': 'THIS IS NOT JSON'})
 
 
 if __name__ == "__main__":
