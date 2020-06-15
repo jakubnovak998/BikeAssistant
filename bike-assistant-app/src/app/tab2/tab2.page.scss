@@ -1,3 +1,38 @@
 ion-content ion-toolbar {
   --background: translucent;
 }
+.history_div
+{
+
+  width: 20%;
+  text-align: center;
+  float: left;
+}
+.history_div_shorter
+{
+
+  width: 10%;
+  text-align: center;
+  float: left;
+}
+.history_div_longer
+{
+
+  width: 30%;
+  text-align: center;
+  float: left;
+}
+.double_history
+{
+  text-align: center;
+  float: left;
+  width: 50%;
+}
+.history_color_one
+{
+  color: forestgreen;
+}
+.history_color_two
+{
+  color: #3a7be0;
+}

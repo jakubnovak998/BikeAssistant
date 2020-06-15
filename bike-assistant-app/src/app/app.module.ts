@@ -18,6 +18,8 @@ import {TabsPageModule} from './tabs/tabs.module';
 import {TabsPage} from './tabs/tabs.page';
 import { TextToSpeech } from '@ionic-native/text-to-speech/ngx';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
+import { AudioManagement } from '@ionic-native/audio-management/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 
 @NgModule({
   declarations: [AppComponent],
@@ -30,6 +32,8 @@ import { SocialSharing } from '@ionic-native/social-sharing/ngx';
     GoogleMaps,
     Toast,
     HTTP,
+    AudioManagement,
+    AndroidPermissions,
     LocalNotifications,
     TextToSpeech,
     SocialSharing,

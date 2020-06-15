@@ -7,9 +7,8 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-        <div style="height: 80%;width: 100%" id="map_canvas"></div>
-    <button ion-button full *ngIf="!isTracking" (click)="startTracking()">Start</button>
-    <button ion-button full *ngIf="isTracking" (click)="stopTracking()">Stop</button>
+        <div style="height: 75%;width: 100%" id="map_canvas"></div>
+   <div style="height: 5%; ">
     <ion-buttons *ngIf="isTracking===false&&trackedRoute.length>0">
         <ion-button size="small" (click)="shareStats(1)">
             <ion-icon name="logo-facebook"></ion-icon>
@@ -21,15 +20,23 @@
             <ion-icon name="share-social-sharp"></ion-icon>
         </ion-button>
     </ion-buttons>
-    <ion-item>
-        <ion-label>
-            Duration {{duration}}
-        </ion-label>
-    </ion-item>
-    <ion-item>
-        <ion-label>
-            Distance {{distance}} km Speed {{speed}} km/h
-        </ion-label>
-    </ion-item>
+   </div>
+    <div style="height: 20%;width: 100%; " id="under_map">
+        <ion-item>
+            <ion-label class="color_one" style=" text-align: center;">Status: </ion-label>
+            <ion-label class="color_two"style=" text-align: center;">Duration </ion-label>
+            <ion-label class="color_one"style=" text-align: center;"> Distance </ion-label>
+            <ion-label class="color_two" style=" text-align: center;"> Speed    </ion-label>
+        </ion-item>
+        <ion-item >
+            <ion-label style=" text-align: center; ">
+                <ion-button style="width: 50px; text-align: center;" size="small" color="success"   *ngIf="!isTracking" (click)="startTracking()">START</ion-button>
+                <ion-button style="width: 50px; text-align: center;"  size="small" color="danger"   *ngIf="isTracking" (click)="stopTracking()"> STOP </ion-button>
+            </ion-label>
+            <ion-label style=" text-align: center; ">{{duration}}</ion-label>
+            <ion-label style=" text-align: center; ">{{distance}} <br> [km]</ion-label>
+            <ion-label style=" text-align: center; ">{{speed}} <br> [km/h]</ion-label>
+        </ion-item>
+    </div>
 
 </ion-content>
