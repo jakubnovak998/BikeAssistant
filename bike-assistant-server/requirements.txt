@@ -4,7 +4,7 @@ get==2019.4.13
 itsdangerous==1.1.0
 Jinja2==2.11.1
 MarkupSafe==1.1.1
-numpy==1.18.4
+numpy==1.22.0
 post==2019.4.13
 public==2019.4.13
 query-string==2019.4.13
